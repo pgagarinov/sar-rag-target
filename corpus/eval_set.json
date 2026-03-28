@@ -1,0 +1,162 @@
+[
+  {
+    "id": "q-001",
+    "question": "How do I rotate API keys without downtime?",
+    "gold_chunk_ids": ["auth-api-keys-1"],
+    "gold_answer": "Use the key rotation endpoint POST /v2/api-keys/{key_id}/rotate to create a new key while keeping the old key active for a configurable grace period (default 24 hours, up to 7 days). Update your application config, deploy, verify, then optionally revoke the old key early.",
+    "difficulty": "easy",
+    "type": "factual"
+  },
+  {
+    "id": "q-002",
+    "question": "What is the default page size for list endpoints?",
+    "gold_chunk_ids": ["api-endpoints-1"],
+    "gold_answer": "The default page size is 25 items, configurable up to 100 via the per_page query parameter. Pagination uses cursor-based navigation.",
+    "difficulty": "easy",
+    "type": "factual"
+  },
+  {
+    "id": "q-003",
+    "question": "How does the PKCE flow work in FluxAPI OAuth?",
+    "gold_chunk_ids": ["auth-oauth-0"],
+    "gold_answer": "Generate a random code verifier (43-128 chars), compute SHA-256 code challenge, redirect user to /oauth/authorize with the challenge, user authenticates, FluxAPI redirects back with a code, exchange code for tokens via POST /oauth/token with the code verifier.",
+    "difficulty": "easy",
+    "type": "how-to"
+  },
+  {
+    "id": "q-004",
+    "question": "What HTTP status code is returned when an API rate limit is exceeded?",
+    "gold_chunk_ids": ["api-errors-1"],
+    "gold_answer": "HTTP 429 Too Many Requests is returned when the rate limit is exceeded. The response includes a Retry-After header and X-RateLimit-Remaining/X-RateLimit-Reset headers.",
+    "difficulty": "easy",
+    "type": "factual"
+  },
+  {
+    "id": "q-005",
+    "question": "How do I set environment variables in FluxAPI?",
+    "gold_chunk_ids": ["config-environments-0"],
+    "gold_answer": "Set variables via the dashboard under Environments > Variables or via PUT /v2/environments/{env}/variables. Keys must match [A-Z][A-Z0-9_]* pattern. Variables take effect on next deployment.",
+    "difficulty": "easy",
+    "type": "how-to"
+  },
+  {
+    "id": "q-006",
+    "question": "What database engines does FluxAPI support?",
+    "gold_chunk_ids": ["data-databases-0"],
+    "gold_answer": "FluxAPI supports PostgreSQL 15+, MySQL 8+, and MongoDB 7+ as managed database engines.",
+    "difficulty": "easy",
+    "type": "factual"
+  },
+  {
+    "id": "q-007",
+    "question": "What is the default TTL for cached values in FluxAPI?",
+    "gold_chunk_ids": ["data-caching-1"],
+    "gold_answer": "The default TTL is 300 seconds (5 minutes) if not specified. Configure global defaults per environment via the FLUX_CACHE_DEFAULT_TTL variable.",
+    "difficulty": "easy",
+    "type": "factual"
+  },
+  {
+    "id": "q-008",
+    "question": "What container sizes are available for vertical scaling?",
+    "gold_chunk_ids": ["deploy-containers-1"],
+    "gold_answer": "Available sizes are small (0.25 vCPU, 256MB), medium (1 vCPU, 1GB), large (4 vCPU, 4GB), and xlarge (8 vCPU, 16GB).",
+    "difficulty": "easy",
+    "type": "factual"
+  },
+  {
+    "id": "q-009",
+    "question": "How does rotation work differently for API keys versus secrets?",
+    "gold_chunk_ids": ["auth-api-keys-1", "config-secrets-1"],
+    "gold_answer": "API key rotation creates a new key with the same scopes and a grace period where both keys are valid (POST /v2/api-keys/{key_id}/rotate). Secret rotation uses policies with generators (random-string, rsa-keypair, database-password), creates a new secret version, and old versions remain accessible during a grace period before being deprecated.",
+    "difficulty": "medium",
+    "type": "comparison"
+  },
+  {
+    "id": "q-010",
+    "question": "What are the different rate limits for different API key scopes?",
+    "gold_chunk_ids": ["auth-api-keys-2"],
+    "gold_answer": "Read-scoped keys: 1000 requests/minute, write-scoped keys: 200 requests/minute, admin keys: 100 requests/minute. Increases can be requested through the dashboard.",
+    "difficulty": "medium",
+    "type": "factual"
+  },
+  {
+    "id": "q-011",
+    "question": "What happens when a connection pool is exhausted in FluxAPI?",
+    "gold_chunk_ids": ["data-databases-1"],
+    "gold_answer": "When a connection pool is exhausted, the application sees 'connection pool exhausted' errors. To resolve, increase the pool size via the FLUX_DB_POOL_SIZE environment variable, optimize query duration, or upgrade the database plan.",
+    "difficulty": "medium",
+    "type": "troubleshooting"
+  },
+  {
+    "id": "q-012",
+    "question": "How do I promote configuration from staging to production?",
+    "gold_chunk_ids": ["config-environments-1"],
+    "gold_answer": "Use POST /v2/environments/{source}/promote with the target environment name. Promotion copies environment variables, feature flags, and scaling config but NOT secrets, database contents, or deployment artifacts. Review the diff at GET /v2/environments/{target}/pending-changes before deploying.",
+    "difficulty": "medium",
+    "type": "how-to"
+  },
+  {
+    "id": "q-013",
+    "question": "What cache invalidation strategies does FluxAPI support?",
+    "gold_chunk_ids": ["data-caching-2"],
+    "gold_answer": "FluxAPI supports four strategies: (1) TTL-based expiry, (2) active invalidation via flux.cache.delete(key), (3) tag-based invalidation via flux.cache.invalidate_tag(), and (4) pub/sub invalidation via change event subscriptions. Invalidation propagates across regions within 500ms.",
+    "difficulty": "medium",
+    "type": "factual"
+  },
+  {
+    "id": "q-014",
+    "question": "How do I implement retry logic for FluxAPI errors?",
+    "gold_chunk_ids": ["api-errors-2"],
+    "gold_answer": "For transient errors (429, 500, 502, 503, 504), use exponential backoff with jitter: start at 1 second, double each retry, add 0-500ms random jitter, cap at 60 seconds, maximum 5 retries. For 429 errors, respect the Retry-After header. Do not retry 400, 401, 403, 404, or 422 errors.",
+    "difficulty": "medium",
+    "type": "how-to"
+  },
+  {
+    "id": "q-015",
+    "question": "How does connection pooling differ between databases and Redis in FluxAPI?",
+    "gold_chunk_ids": ["data-databases-1", "data-caching-1"],
+    "gold_answer": "Database connection pooling uses PgBouncer (PostgreSQL) or ProxySQL (MySQL) with a default pool size of 25 per instance and transaction-mode pooling. Redis connection pooling uses the SDK's built-in client with a default pool size of 10 per instance. Both are configurable.",
+    "difficulty": "hard",
+    "type": "comparison"
+  },
+  {
+    "id": "q-016",
+    "question": "My API is slow. How do I identify whether the bottleneck is the database, cache, or container sizing?",
+    "gold_chunk_ids": ["troubleshoot-performance-0", "troubleshoot-performance-1"],
+    "gold_answer": "Use distributed tracing (X-Flux-Trace-Id) to see where latency occurs in the request lifecycle. Check slow query logs for database bottlenecks, cache hit rates for cache issues, and enable CPU/memory profiling to check container sizing. Database queries are the most frequent bottleneck — check connection pool stats and slow query logs first.",
+    "difficulty": "hard",
+    "type": "troubleshooting"
+  },
+  {
+    "id": "q-017",
+    "question": "How should I set up a complete CI/CD pipeline with FluxAPI including database migrations, secret management, and container deployment?",
+    "gold_chunk_ids": ["data-databases-1", "config-secrets-0", "deploy-containers-0"],
+    "gold_answer": "Store secrets via POST /v2/secrets and reference them as $SECRET{name} in config. Apply database migrations during deployment via the pre_deploy hook or POST /v2/databases/{id}/migrate. Push container images to registry.fluxapi.io, tag per environment and version. Migrations run in transactions and roll back on failure.",
+    "difficulty": "hard",
+    "type": "how-to"
+  },
+  {
+    "id": "q-018",
+    "question": "What security features protect FluxAPI container deployments from vulnerabilities?",
+    "gold_chunk_ids": ["deploy-containers-0"],
+    "gold_answer": "FluxAPI scans container images for CVEs on push, supports blocking vulnerable images via Settings > Security > Image Policy, enforces TLS on all connections, provides non-root user execution, and uses automatic TLS termination at the load balancer. Internal traffic uses a service mesh.",
+    "difficulty": "hard",
+    "type": "factual"
+  },
+  {
+    "id": "q-019",
+    "question": "I'm getting HTTP 429 errors. Is this a rate limit issue with my API key or a server-side problem?",
+    "gold_chunk_ids": ["api-errors-1", "auth-api-keys-2"],
+    "gold_answer": "HTTP 429 is a rate limit error on your API key. Check your key scope — read keys allow 1000 req/min, write 200, admin 100. The response includes Retry-After, X-RateLimit-Remaining, and X-RateLimit-Reset headers. Request limit increases in Settings > Rate Limits. This is NOT a server error (those are 5xx).",
+    "difficulty": "medium",
+    "type": "troubleshooting"
+  },
+  {
+    "id": "q-020",
+    "question": "What is the difference between environment isolation in FluxAPI environments versus container networking isolation?",
+    "gold_chunk_ids": ["config-environments-2", "deploy-containers-2"],
+    "gold_answer": "Environment isolation provides separate compute instances, network policies, and data stores per environment (dev/staging/prod) with cross-environment access blocked by default. Container networking isolation uses a service mesh for internal communication at {service-name}.internal.fluxapi.io with automatic TLS termination and health-check-based routing.",
+    "difficulty": "hard",
+    "type": "comparison"
+  }
+]
