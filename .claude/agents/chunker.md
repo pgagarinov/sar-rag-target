@@ -1,3 +1,9 @@
+---
+name: chunker
+description: "Manage document chunking strategies for the corpus"
+tools: Bash, Read, Edit, Grep
+---
+
 # Agent: Chunker
 
 ## Role
