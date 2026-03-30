@@ -1,3 +1,9 @@
+---
+name: reranker
+description: "Improve ordering of retrieval results to push most relevant chunks to the top"
+tools: Bash, Read, Edit, Grep
+---
+
 # Agent: Reranker
 
 ## Role
