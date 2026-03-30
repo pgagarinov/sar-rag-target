@@ -1,40 +1,29 @@
 """End-to-end RAG pipeline: chunk, index, evaluate."""
 
-from pathlib import Path
-
 import chromadb
 
 from rag.chunker import chunk_corpus
-from rag.config import CHROMA_PATH, CORPUS_DIR
+from rag.config import CHROMA_PATH
 from rag.evaluator import EvalReport, evaluate, write_report
-from rag.indexer import build_index, load_index
+from rag.indexer import build_index
 
 
-def setup(corpus_dir: Path | None = None) -> chromadb.Collection:
-    """Chunk the corpus and build the ChromaDB index.
+def setup() -> chromadb.Collection:
+    """Chunk the corpus and build the ChromaDB index."""
+    print("Loading QASPER papers from HuggingFace...")
+    chunks = chunk_corpus()
+    print(f"  {len(chunks)} chunks from {len(set(c.metadata['doc_name'] for c in chunks))} papers")
 
-    Returns the collection for querying.
-    """
-    if corpus_dir is None:
-        corpus_dir = Path(CORPUS_DIR)
-
-    print(f"Chunking corpus from {corpus_dir}...")
-    chunks = chunk_corpus(corpus_dir)
-    print(f"  {len(chunks)} chunks from {len(set(c.metadata['doc_name'] for c in chunks))} documents")
-
-    print("Building ChromaDB index...")
+    print("Building ChromaDB index (MLX embeddings)...")
     collection = build_index(chunks)
     print(f"  Collection '{collection.name}' with {collection.count()} vectors")
 
     return collection
 
 
-def run_eval(corpus_dir: Path | None = None) -> EvalReport:
-    """Run the full evaluation pipeline.
-
-    Chunks corpus, builds index, evaluates, writes report.
-    """
-    collection = setup(corpus_dir)
+def run_eval() -> EvalReport:
+    """Run the full evaluation pipeline."""
+    collection = setup()
 
     print("\nRunning evaluation...")
     report = evaluate(collection)

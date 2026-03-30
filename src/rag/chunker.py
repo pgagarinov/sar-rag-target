@@ -1,9 +1,8 @@
 """Document chunking with deterministic chunk IDs."""
 
 from dataclasses import dataclass, field
-from pathlib import Path
 
-from rag.config import CHUNK_SIZE, CORPUS_DIR
+from rag.config import CHUNK_SIZE
 
 
 @dataclass
@@ -13,39 +12,31 @@ class Chunk:
     metadata: dict = field(default_factory=dict)
 
 
-def chunk_document(doc_path: Path) -> list[Chunk]:
-    """Split a document into fixed-size character chunks.
-
-    Chunk IDs are deterministic: {doc_stem}-{chunk_index} where index is 0-based.
-    """
-    text = doc_path.read_text(encoding="utf-8")
-    doc_stem = doc_path.stem
+def chunk_text(text: str, doc_id: str) -> list[Chunk]:
+    """Split text into fixed-size character chunks with deterministic IDs."""
     chunks = []
-
     for i in range(0, len(text), CHUNK_SIZE):
         chunk_text = text[i : i + CHUNK_SIZE]
-        chunk_id = f"{doc_stem}-{i // CHUNK_SIZE}"
+        chunk_id = f"{doc_id}-{i // CHUNK_SIZE}"
         chunks.append(
             Chunk(
                 id=chunk_id,
                 text=chunk_text,
                 metadata={
-                    "doc_name": doc_stem,
+                    "doc_name": doc_id,
                     "chunk_index": i // CHUNK_SIZE,
                 },
             )
         )
-
     return chunks
 
 
-def chunk_corpus(corpus_dir: Path | None = None) -> list[Chunk]:
-    """Chunk all markdown files in the corpus directory."""
-    if corpus_dir is None:
-        corpus_dir = Path(CORPUS_DIR)
-
+def chunk_corpus() -> list[Chunk]:
+    """Chunk all QASPER papers from HuggingFace dataset."""
+    from rag.corpus import load_papers, paper_to_text
+    papers = load_papers()
     all_chunks = []
-    for doc_path in sorted(corpus_dir.glob("*.md")):
-        all_chunks.extend(chunk_document(doc_path))
-
+    for paper in papers:
+        text = paper_to_text(paper)
+        all_chunks.extend(chunk_text(text, paper.id))
     return all_chunks

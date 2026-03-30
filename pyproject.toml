@@ -2,7 +2,7 @@
 name = "rag-search-system"
 version = "0.1.0"
 requires-python = "==3.13.*"
-dependencies = ["chromadb>=0.6,<1.0", "rank-bm25>=0.2"]
+dependencies = ["chromadb>=0.6,<1.0", "rank-bm25>=0.2", "datasets>=3,<4"]
 
 [build-system]
 build-backend = "hatchling.build"
@@ -18,8 +18,17 @@ platforms = ["osx-arm64", "linux-64", "linux-aarch64"]
 [tool.pixi.pypi-dependencies]
 rag-search-system = { path = ".", editable = true }
 
+[tool.pixi.feature.mlx]
+platforms = ["osx-arm64"]
+
+[tool.pixi.feature.mlx.system-requirements]
+macos = "15.0"
+
+[tool.pixi.feature.mlx.pypi-dependencies]
+mlx-embeddings = ">=0.1"
+
 [tool.pixi.environments]
-dev = { features = ["dev"], solve-group = "default" }
+dev = { features = ["dev", "mlx"], solve-group = "default" }
 
 [tool.pixi.tasks]
 eval = "PYTHONPATH=src python -m rag.pipeline"
@@ -31,7 +40,7 @@ test = "PYTHONPATH=src python -m pytest tests/ -v"
 python = "3.13.*"
 
 [dependency-groups]
-dev = ["pytest>=8,<9"]
+dev = ["pytest>=8,<9", "pytest-timeout>=2,<3"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -39,3 +48,4 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = ["-v", "--tb=short"]
+timeout = 60

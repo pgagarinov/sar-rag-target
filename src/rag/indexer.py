@@ -7,21 +7,18 @@ import chromadb
 
 from rag.chunker import Chunk
 from rag.config import CHROMA_PATH, COLLECTION_NAME
+from rag.embeddings import get_embedding_function
 
 
 def build_index(chunks: list[Chunk]) -> chromadb.Collection:
-    """Build a ChromaDB collection from chunks.
-
-    Uses the default ONNX all-MiniLM-L6-v2 embedding function.
-    Removes any existing collection first to ensure a clean build.
-    """
+    """Build a ChromaDB collection from chunks."""
     chroma_path = Path(CHROMA_PATH)
     if chroma_path.exists():
         shutil.rmtree(chroma_path)
 
+    ef = get_embedding_function()
     client = chromadb.PersistentClient(path=str(chroma_path))
 
-    # Delete collection if it exists (shouldn't after rmtree, but be safe)
     try:
         client.delete_collection(COLLECTION_NAME)
     except ValueError:
@@ -30,9 +27,9 @@ def build_index(chunks: list[Chunk]) -> chromadb.Collection:
     collection = client.get_or_create_collection(
         name=COLLECTION_NAME,
         metadata={"hnsw:space": "cosine"},
+        embedding_function=ef,
     )
 
-    # Add chunks in batches to avoid memory issues
     batch_size = 100
     for i in range(0, len(chunks), batch_size):
         batch = chunks[i : i + batch_size]
@@ -54,5 +51,6 @@ def build_index(chunks: list[Chunk]) -> chromadb.Collection:
 
 def load_index() -> chromadb.Collection:
     """Load an existing ChromaDB collection."""
+    ef = get_embedding_function()
     client = chromadb.PersistentClient(path=str(CHROMA_PATH))
-    return client.get_collection(name=COLLECTION_NAME)
+    return client.get_collection(name=COLLECTION_NAME, embedding_function=ef)
