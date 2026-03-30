@@ -1,20 +1,24 @@
-"""MLX-based embedding function for ChromaDB on Apple Silicon."""
+"""MLX-based embedding function for Apple Silicon, with ONNX fallback."""
 
-from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
+from typing import Protocol
 
 
-class MLXEmbeddingFunction(EmbeddingFunction[Documents]):
+class EmbeddingFunction(Protocol):
+    def __call__(self, input: list[str]) -> list[list[float]]: ...
+
+
+class MLXEmbeddingFunction:
     """Embedding function using MLX for Apple Silicon GPU acceleration.
 
     Uses all-MiniLM-L6-v2 (4-bit quantized) via mlx-embeddings.
-    ~90x faster than ChromaDB's default ONNX CPU embeddings on Apple Silicon.
+    Clears Metal cache after each call to prevent memory accumulation.
     """
 
     def __init__(self, model_name: str = "mlx-community/all-MiniLM-L6-v2-4bit"):
         from mlx_embeddings.utils import load
         self._model, self._tokenizer = load(model_name)
 
-    def __call__(self, input: Documents) -> Embeddings:
+    def __call__(self, input: list[str]) -> list[list[float]]:
         import mlx.core as mx
         inputs = self._tokenizer(
             list(input), return_tensors="mlx",
@@ -22,17 +26,23 @@ class MLXEmbeddingFunction(EmbeddingFunction[Documents]):
         )
         outputs = self._model(**inputs)
         mx.eval(outputs.text_embeds)
-        return outputs.text_embeds.tolist()
+        result = outputs.text_embeds.tolist()
+
+        # Release MLX tensors and Metal GPU cache to prevent accumulation
+        del inputs, outputs
+        mx.clear_cache()
+
+        return result
 
 
 def get_embedding_function() -> EmbeddingFunction:
     """Get the best available embedding function.
 
-    Uses MLX on Apple Silicon, falls back to ChromaDB's default ONNX on other platforms.
+    Uses MLX on Apple Silicon, falls back to sentence-transformers on other platforms.
     """
     try:
         return MLXEmbeddingFunction()
     except (ImportError, RuntimeError):
-        # MLX not available (Linux, non-ARM Mac) — use ChromaDB default
-        from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2
-        return ONNXMiniLM_L6_V2()
+        from sentence_transformers import SentenceTransformer
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+        return lambda input: model.encode(input).tolist()

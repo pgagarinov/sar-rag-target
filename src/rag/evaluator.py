@@ -5,9 +5,8 @@ import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import chromadb
-
 from rag.config import EVAL_SET_PATH, REPORT_PATH, TOP_K
+from rag.indexer import VectorIndex
 from rag.reranker import rerank
 from rag.retriever import retrieve
 
@@ -96,14 +95,11 @@ def _ndcg_at_k(retrieved: list[str], gold: set[str], k: int) -> float:
     """NDCG@k: normalized discounted cumulative gain."""
     top_k = retrieved[:k]
 
-    # DCG: sum of (relevance / log2(position + 1))
-    # Binary relevance: 1 if in gold, 0 otherwise
     dcg = 0.0
     for i, r in enumerate(top_k):
         if r in gold:
-            dcg += 1.0 / math.log2(i + 2)  # +2 because position is 1-indexed
+            dcg += 1.0 / math.log2(i + 2)
 
-    # Ideal DCG: all gold items ranked first
     ideal_k = min(len(gold), k)
     idcg = sum(1.0 / math.log2(i + 2) for i in range(ideal_k))
 
@@ -113,12 +109,12 @@ def _ndcg_at_k(retrieved: list[str], gold: set[str], k: int) -> float:
 
 
 def evaluate_question(
-    collection: chromadb.Collection,
+    index: VectorIndex,
     question: EvalQuestion,
     k: int = TOP_K,
 ) -> QuestionResult:
     """Evaluate a single question."""
-    results = retrieve(collection, question.question, k=k)
+    results = retrieve(index, question.question, k=k)
     results = rerank(results, question.question)
 
     retrieved_ids = [r.chunk_id for r in results]
@@ -141,7 +137,7 @@ def evaluate_question(
 
 
 def evaluate(
-    collection: chromadb.Collection,
+    index: VectorIndex,
     eval_set_path: Path | None = None,
     k: int = TOP_K,
 ) -> EvalReport:
@@ -151,7 +147,7 @@ def evaluate(
     hits = 0
 
     for q in questions:
-        result = evaluate_question(collection, q, k=k)
+        result = evaluate_question(index, q, k=k)
         question_results.append(result)
         if result.recall > 0:
             hits += 1
@@ -174,7 +170,6 @@ def evaluate(
     mrr = round(sum(r.rr for r in question_results) / n, 4)
     mean_ndcg = round(sum(r.ndcg for r in question_results) / n, 4)
 
-    # Check if all questions have perfect precision and recall
     all_perfect = all(
         r.precision == 1.0 and r.recall == 1.0 for r in question_results
     )

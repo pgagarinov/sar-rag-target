@@ -2,7 +2,7 @@
 name = "rag-search-system"
 version = "0.1.0"
 requires-python = "==3.13.*"
-dependencies = ["chromadb>=0.6,<1.0", "rank-bm25>=0.2", "datasets>=3,<4"]
+dependencies = ["usearch>=2.23,<3", "numpy>=1.26,<3", "datasets>=3,<4"]
 
 [build-system]
 build-backend = "hatchling.build"
@@ -30,10 +30,8 @@ mlx-embeddings = ">=0.1"
 [tool.pixi.environments]
 dev = { features = ["dev", "mlx"], solve-group = "default" }
 
-[tool.pixi.tasks]
-eval = "PYTHONPATH=src python -m rag.pipeline"
-
 [tool.pixi.feature.dev.tasks]
+eval = "PYTHONPATH=src python -m rag.pipeline"
 test = "PYTHONPATH=src python -m pytest tests/ -v"
 
 [tool.pixi.dependencies]

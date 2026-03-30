@@ -8,3 +8,4 @@ build/
 .chroma/
 corpus/docs/
 .env
+.supervisor/

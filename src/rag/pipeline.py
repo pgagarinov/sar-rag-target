@@ -1,32 +1,24 @@
 """End-to-end RAG pipeline: chunk, index, evaluate."""
 
-import chromadb
-
-from rag.chunker import chunk_corpus
-from rag.config import CHROMA_PATH
+from rag.chunker import iter_chunks
 from rag.evaluator import EvalReport, evaluate, write_report
-from rag.indexer import build_index
+from rag.indexer import VectorIndex, build_index
 
 
-def setup() -> chromadb.Collection:
-    """Chunk the corpus and build the ChromaDB index."""
-    print("Loading QASPER papers from HuggingFace...")
-    chunks = chunk_corpus()
-    print(f"  {len(chunks)} chunks from {len(set(c.metadata['doc_name'] for c in chunks))} papers")
-
-    print("Building ChromaDB index (MLX embeddings)...")
-    collection = build_index(chunks)
-    print(f"  Collection '{collection.name}' with {collection.count()} vectors")
-
-    return collection
+def setup() -> VectorIndex:
+    """Stream QASPER papers through chunker → embedder → USearch index."""
+    print("Streaming QASPER papers → chunks → USearch index (MLX embeddings)...")
+    index = build_index(iter_chunks())
+    print(f"  {index.count()} vectors indexed")
+    return index
 
 
 def run_eval() -> EvalReport:
     """Run the full evaluation pipeline."""
-    collection = setup()
+    index = setup()
 
     print("\nRunning evaluation...")
-    report = evaluate(collection)
+    report = evaluate(index)
     write_report(report)
 
     print(f"\nResults:")

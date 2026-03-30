@@ -1,5 +1,6 @@
 """Document chunking with deterministic chunk IDs."""
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 
 from rag.config import CHUNK_SIZE
@@ -31,12 +32,9 @@ def chunk_text(text: str, doc_id: str) -> list[Chunk]:
     return chunks
 
 
-def chunk_corpus() -> list[Chunk]:
-    """Chunk all QASPER papers from HuggingFace dataset."""
-    from rag.corpus import load_papers, paper_to_text
-    papers = load_papers()
-    all_chunks = []
-    for paper in papers:
+def iter_chunks() -> Iterator[Chunk]:
+    """Yield chunks from all QASPER papers without materializing everything."""
+    from rag.corpus import iter_papers, paper_to_text
+    for paper in iter_papers():
         text = paper_to_text(paper)
-        all_chunks.extend(chunk_text(text, paper.id))
-    return all_chunks
+        yield from chunk_text(text, paper.id)
