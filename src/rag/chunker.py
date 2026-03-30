@@ -38,3 +38,12 @@ def iter_chunks() -> Iterator[Chunk]:
     for paper in iter_papers():
         text = paper_to_text(paper)
         yield from chunk_text(text, paper.id)
+
+
+def iter_chunk_ids() -> Iterator[str]:
+    """Yield only chunk IDs — lightweight pass for cache key computation."""
+    from rag.corpus import iter_papers, paper_to_text
+    for paper in iter_papers():
+        text = paper_to_text(paper)
+        for i in range(0, len(text), CHUNK_SIZE):
+            yield f"{paper.id}-{i // CHUNK_SIZE}"

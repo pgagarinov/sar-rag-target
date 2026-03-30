@@ -1,15 +1,16 @@
 """End-to-end RAG pipeline: chunk, index, evaluate."""
 
+from rag.cache import load_or_build
 from rag.chunker import iter_chunks
 from rag.evaluator import EvalReport, evaluate, write_report
 from rag.indexer import VectorIndex, build_index
 
 
 def setup() -> VectorIndex:
-    """Stream QASPER papers through chunker → embedder → USearch index."""
-    print("Streaming QASPER papers → chunks → USearch index (MLX embeddings)...")
-    index = build_index(iter_chunks())
-    print(f"  {index.count()} vectors indexed")
+    """Load cached index or build from scratch (two-pass early exit)."""
+    print("Preparing USearch index...")
+    index = load_or_build(lambda: build_index(iter_chunks()))
+    print(f"  {index.count()} vectors ready")
     return index
 
 
