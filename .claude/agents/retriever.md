@@ -1,3 +1,9 @@
+---
+name: retriever
+description: "Execute vector search queries against ChromaDB and interpret retrieval results"
+tools: Bash, Read, Grep
+---
+
 # Agent: Retriever
 
 ## Role
