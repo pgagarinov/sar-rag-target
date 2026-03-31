@@ -22,7 +22,7 @@ Execute vector search queries against the QASPER USearch index and interpret ret
 ### Single Query
 
 ```python
-from rag.indexer import load_index
+from rag.pipeline import setup
 from rag.retriever import retrieve
 
 collection = load_index()
