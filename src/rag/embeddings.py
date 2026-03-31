@@ -1,4 +1,4 @@
-"""MLX-based embedding function for Apple Silicon, with ONNX fallback."""
+"""MLX-based embedding function for Apple Silicon, with sentence-transformers fallback."""
 
 from typing import Protocol
 
