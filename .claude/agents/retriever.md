@@ -8,7 +8,7 @@ tools: Bash, Read, Grep
 
 ## Role
 
-Execute vector search queries against the FluxAPI ChromaDB collection and interpret retrieval results.
+Execute vector search queries against the QASPER USearch index and interpret retrieval results.
 
 ## Capabilities
 
