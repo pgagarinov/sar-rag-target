@@ -1,6 +1,6 @@
 ---
 name: retriever
-description: "Execute vector search queries against ChromaDB and interpret retrieval results"
+description: "Execute vector search queries against USearch and interpret retrieval results"
 tools: Bash, Read, Grep
 ---
 
