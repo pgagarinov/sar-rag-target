@@ -57,5 +57,5 @@ When retrieval quality is low, consider:
 1. **Query expansion**: Reformulate queries with synonyms or related terms
 2. **Hybrid search**: Combine vector similarity with BM25 keyword matching
 3. **Chunk size tuning**: Adjust CHUNK_SIZE in config.py (smaller chunks = more precise, larger = more context)
-4. **Embedding model**: Try different embedding models via ChromaDB's embedding function parameter
+4. **Embedding model**: Try different embedding models via embeddings.py (MLX on Apple Silicon)
 5. **Metadata filtering**: Pre-filter by document category before vector search
