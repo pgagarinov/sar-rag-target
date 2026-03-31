@@ -99,5 +99,5 @@ def extract_metadata(text, doc_path):
 - Chunk IDs must remain deterministic and follow `{doc_stem}-{chunk_index}` pattern
 - After changing chunking strategy, the eval set's gold_chunk_ids may need updating
 - Always run `pixi run eval` to measure impact of chunking changes
-- Never modify the source documents in `corpus/docs/`
+- Source documents are streamed from HuggingFace — not locally modifiable
 - Smaller chunks improve precision but may lose context; larger chunks improve recall but add noise
