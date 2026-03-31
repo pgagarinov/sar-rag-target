@@ -25,7 +25,7 @@ Execute vector search queries against the QASPER USearch index and interpret ret
 from rag.pipeline import setup
 from rag.retriever import retrieve
 
-collection = load_index()
+index = setup()()
 results = retrieve(collection, "How do I rotate API keys?", k=5)
 for r in results:
     print(f"{r.chunk_id} (score: {r.score:.3f}): {r.text[:100]}...")
