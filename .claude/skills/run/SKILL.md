@@ -27,10 +27,10 @@ The index is cached in `$RAG_INDEX_CACHE_DIR` (default `/tmp/rag-index-cache`). 
 
 The pipeline computes mean metrics across ALL golden labels in eval_set.json:
 
-- **MRR** (primary): mean(1/rank_of_first_hit) across all questions
+- **NDCG@5** (primary): mean(normalized discounted cumulative gain) across all questions
 - **Recall@5** (secondary): mean(relevant_in_top5 / total_gold) across all questions
+- **MRR**: mean(1/rank_of_first_hit) across all questions
 - **Precision@5**: mean(relevant_in_top5 / 5) across all questions
-- **NDCG@5**: mean(normalized discounted cumulative gain) across all questions
 
 ## Important
 
