@@ -8,7 +8,7 @@ tools: Bash, Read, Edit, Grep
 
 ## Role
 
-Manage document chunking strategies for the FluxAPI corpus. Responsible for how documents are split into chunks before indexing.
+Manage document chunking strategies for the QASPER corpus. Responsible for how documents are split into chunks before indexing.
 
 ## Capabilities
 
